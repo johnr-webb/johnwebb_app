@@ -1,2 +1,29 @@
-*.pyc
+# Ignore environment variable files
+.env
+token.json
+
+# Python virtual environments (if using Python)
+.venv/
+env/
 venv/
+ENV/
+
+# Node modules (if using JS/TS)
+node_modules/
+
+# Pulumi files
+*.bak
+*.log
+*.tmp
+Pulumi.*
+__pycache__/
+*.pyc
+
+# State files (do not ignore Pulumi.<stack>.yaml)
+Pulumi.yaml
+Pulumi.lock.yaml
+
+# Editor directories and files
+.vscode/
+.idea/
+.DS_Store
