@@ -2,7 +2,7 @@
 
 import apiClient from '../../../services/apiClient';
 
-const API_URL = '/users'; // Adjust if your API is different
+const API_URL = '/users';
 
 export const getUsers = async () => await apiClient.get(API_URL).then(res => res.data);
 export const getUser = async (id) => await apiClient.get(`${API_URL}/${id}`).then(res => res.data);

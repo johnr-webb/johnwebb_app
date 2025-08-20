@@ -1,0 +1,4 @@
+# .gitignore project level
+
+# MacOS specific files
+.DS_Store
