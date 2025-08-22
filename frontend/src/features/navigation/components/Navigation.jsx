@@ -1,77 +1,130 @@
-// import { Link } from 'react-router-dom';
-// import { routes } from '../../../router';
-
-// export const Navigation = () => {
-//   if (!routes || routes.length === 0) {
-//     console.log('Routes not loaded yet');
-//     return null;
-//   }
-  
-//   return (
-//     <nav className="main-nav">
-//       <div className='nav-content'>
-//         <Link to="/" className="nav-logo">
-//           <img src="/favicon.png" alt="Home" className="nav-logo-image" />
-//         </Link>
-//         <ul className="nav-list">
-//           {routes.map((route) => (
-//             <li key={route.path} className="nav-item">
-//               <Link to={route.path} className="nav-link">
-//                 {route.label}
-//               </Link>
-//             </li>
-//           ))}
-//         </ul>
-//       </div>
-//     </nav>
-//   );
-// };
-
-
-
+// src/components/Navigation.jsx
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { routes } from '../../../router';
+import {
+  AppBar,
+  Toolbar,
+  Box,
+  IconButton,
+  Menu,
+  MenuItem,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+
+// Styled Link component to be used for navigation items
+const StyledLink = styled(Link)(({ theme }) => ({
+  color: theme.palette.text.primary,
+  textDecoration: 'none',
+  padding: theme.spacing(1),
+  borderRadius: theme.shape.borderRadius,
+  transition: theme.transitions.create(['background-color', 'color'], {
+    duration: theme.transitions.duration.short,
+  }),
+  '&:hover': {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.common.white,
+  },
+}));
+
+// A styled Box to create the hamburger lines
+const HamburgerLines = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+  width: '24px',
+  height: '18px',
+  '& span': {
+    display: 'block',
+    width: '100%',
+    height: '2px',
+    backgroundColor: theme.palette.text.primary,
+    borderRadius: theme.shape.borderRadius,
+  }
+}));
 
 export const Navigation = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   if (!routes || routes.length === 0) {
     console.log('Routes not loaded yet');
     return null;
   }
-  
+
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
-    <nav className="main-nav">
-      <div className="nav-content">
-        <div className="nav-top">
-          <Link to="/" className="nav-logo">
-            <img src="/favicon.png" alt="Home" className="nav-logo-image" />
-          </Link>
-          <button 
-            className="hamburger-button"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            <span className="hamburger-line"></span>
-            <span className="hamburger-line"></span>
-            <span className="hamburger-line"></span>
-          </button>
-        </div>
-        <ul className={`nav-list ${isMenuOpen ? 'menu-open' : ''}`}>
-          {routes.map((route) => (
-            <li key={route.path} className="nav-item">
-              <Link 
-                to={route.path} 
-                className="nav-link"
-                onClick={() => setIsMenuOpen(false)}
-              >
+    <AppBar position="static" sx={{ backgroundColor: 'background.paper', borderBottom: 1, borderColor: 'divider', boxShadow: 'none' }}>
+      <Toolbar sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: theme.spacing(1),
+        maxWidth: 1280,
+        margin: '0 auto',
+        width: '100%',
+      }}>
+        <StyledLink to="/">
+          <img src="/favicon.png" alt="Home" style={{ height: 32, width: 'auto' }} />
+        </StyledLink>
+
+        {isMobile ? (
+          <Box>
+            <IconButton
+              aria-label="Toggle menu"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleMenu}
+              color="inherit"
+              sx={{ color: 'text.primary' }}
+            >
+              <HamburgerLines>
+                <span />
+                <span />
+                <span />
+              </HamburgerLines>
+            </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorEl}
+              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+              keepMounted
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+              open={open}
+              onClose={handleClose}
+            >
+              {routes.map((route) => (
+                <MenuItem key={route.path} onClick={handleClose}>
+                  <StyledLink to={route.path}>
+                    {route.label}
+                  </StyledLink>
+                </MenuItem>
+              ))}
+            </Menu>
+          </Box>
+        ) : (
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            {routes.map((route) => (
+              <StyledLink key={route.path} to={route.path}>
                 {route.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </nav>
+              </StyledLink>
+            ))}
+          </Box>
+        )}
+      </Toolbar>
+    </AppBar>
   );
 };
+
+export default Navigation;
