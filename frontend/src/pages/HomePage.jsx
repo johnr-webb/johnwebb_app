@@ -66,7 +66,7 @@ const HomePage = () => {
             >
               My Latest Projects
             </Typography>
-            <Typography sx={{ color: 'var(--text-color)' }}>
+            <Typography sx={{ color: 'text.primary' }}>
               Explore my portfolio of work, from web applications to open-source contributions.
             </Typography>
           </Paper>
