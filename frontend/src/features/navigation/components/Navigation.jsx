@@ -56,6 +56,8 @@ export const Navigation = () => {
     return null;
   }
 
+  const navigationRoutes = routes.filter(route => route.inNav);
+
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -104,7 +106,7 @@ export const Navigation = () => {
               open={open}
               onClose={handleClose}
             >
-              {routes.map((route) => (
+              {navigationRoutes.map((route) => (
                 <MenuItem key={route.path} onClick={handleClose}>
                   <StyledLink to={route.path}>
                     {route.label}
@@ -115,7 +117,7 @@ export const Navigation = () => {
           </Box>
         ) : (
           <Box sx={{ display: 'flex', gap: 2 }}>
-            {routes.map((route) => (
+            {navigationRoutes.map((route) => (
               <StyledLink key={route.path} to={route.path}>
                 {route.label}
               </StyledLink>
