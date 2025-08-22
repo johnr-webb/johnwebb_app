@@ -6,8 +6,7 @@ const HomePage = () => {
     <Container
       maxWidth="xl"
       sx={{
-        padding: '2rem',
-        maxWidth: 1280,
+        padding: '1rem',
         margin: '0 auto',
       }}
     >
@@ -17,34 +16,34 @@ const HomePage = () => {
           variant="h2"
           component="h1"
           sx={{
-            fontSize: '3rem',
+            fontSize: '2rem',
             marginBottom: '0.5rem',
-            color: 'var(--text-color)',
+            color: 'text.primary',
           }}
         >
-          Welcome to my Site!
+          Welcome to John Webb dot com
         </Typography>
         <Typography
           variant="h5"
           component="p"
           sx={{
             fontSize: '1.25rem',
-            color: 'var(--text-color-light)',
+            color: 'text.secondary',
           }}
         >
-          A space for my projects, thoughts, and more.
+          A space for my projects, thoughts, and more!
         </Typography>
       </Box>
 
       {/* Grid for content boxes */}
-      <Grid container spacing={2.5}>
+      <Grid container spacing={2}>
         {/* Box 1 */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Paper
             sx={{
-              backgroundColor: 'var(--background-color-alt)',
-              padding: '1.5rem',
-              borderRadius: 'var(--border-radius)',
+              backgroundColor: 'background.paper',
+              padding: '1.0rem',
+              borderRadius: 'spacing',
               boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
               transition: 'transform 0.2s',
               '&:hover': {
@@ -58,7 +57,11 @@ const HomePage = () => {
               sx={{
                 fontSize: '1.5rem',
                 marginBottom: '0.75rem',
-                color: 'var(--primary-color)',
+                color: 'text.primary',
+                // Fixing overflow issue
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}
             >
               My Latest Projects
@@ -70,12 +73,12 @@ const HomePage = () => {
         </Grid>
 
         {/* Box 2 */}
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Paper
             sx={{
-              backgroundColor: 'var(--background-color-alt)',
-              padding: '1.5rem',
-              borderRadius: 'var(--border-radius)',
+              backgroundColor: 'background.paper',
+              padding: '1.0rem',
+              borderRadius: 'spacing',
               boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
               transition: 'transform 0.2s',
               '&:hover': {
@@ -89,12 +92,20 @@ const HomePage = () => {
               sx={{
                 fontSize: '1.5rem',
                 marginBottom: '0.75rem',
-                color: 'var(--primary-color)',
+                color: 'text.primary',
+                // Fixes overflow issue
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}
             >
               Technical Insights
             </Typography>
-            <Typography sx={{ color: 'var(--text-color)' }}>
+            <Typography
+                sx={{
+                    color: 'text.primary',
+                }}
+            >
               Read my latest articles on software architecture, DevOps, and more.
             </Typography>
           </Paper>
