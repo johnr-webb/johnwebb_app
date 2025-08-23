@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import HomePage from '../pages/HomePage';
 import UsersPage from '../features/users/pages/UsersPage';
 import PostsPage from '../features/posts/pages/PostsPage';
+import CalendarPage from '../features/calendar/pages/CalendarPage';
 
 // Route configuration
 export const routes = [
@@ -21,6 +22,12 @@ export const routes = [
     path: '/posts',
     element: <PostsPage />,
     label: 'Posts',
+    inNav: true,
+  },
+  {
+    path: '/calendar',
+    element: <CalendarPage />,
+    label: 'Calendar',
     inNav: true,
   }
 ];
