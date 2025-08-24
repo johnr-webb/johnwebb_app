@@ -10,12 +10,14 @@ import {
   Menu,
   MenuItem,
   useMediaQuery,
-  useTheme
+  useTheme,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 // Styled Link component to be used for navigation items
 const StyledLink = styled(Link)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
   color: theme.palette.text.primary,
   textDecoration: 'none',
   padding: theme.spacing(1),
@@ -42,7 +44,7 @@ const HamburgerLines = styled(Box)(({ theme }) => ({
     height: '2px',
     backgroundColor: theme.palette.text.primary,
     borderRadius: theme.shape.borderRadius,
-  }
+  },
 }));
 
 export const Navigation = () => {
@@ -56,7 +58,7 @@ export const Navigation = () => {
     return null;
   }
 
-  const navigationRoutes = routes.filter(route => route.inNav);
+  const navigationRoutes = routes.filter((route) => route.inNav);
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -67,18 +69,27 @@ export const Navigation = () => {
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: 'background.paper', borderBottom: 1, borderColor: 'divider', boxShadow: 'none' }}>
-      <Toolbar sx={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: theme.spacing(1),
-        maxWidth: 1280,
-        margin: '0 auto',
-        width: '100%',
-      }}>
+    <AppBar
+      position="static"
+      sx={{
+        backgroundColor: 'background.paper',
+        borderBottom: 1,
+        borderColor: 'divider',
+        boxShadow: 'none',
+      }}
+    >
+      <Toolbar
+        sx={{
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: theme.spacing(1),
+          maxWidth: 1280,
+          margin: '0 auto',
+          width: '100%',
+        }}
+      >
         <StyledLink to="/">
-          <img src="/favicon.png" alt="Home" style={{ height: 32, width: 'auto' }} />
+          <img src="/favicon.png" alt="Home" style={{ height: 44, width: 44 }} />
         </StyledLink>
 
         {isMobile ? (
@@ -108,9 +119,7 @@ export const Navigation = () => {
             >
               {navigationRoutes.map((route) => (
                 <MenuItem key={route.path} onClick={handleClose}>
-                  <StyledLink to={route.path}>
-                    {route.label}
-                  </StyledLink>
+                  <StyledLink to={route.path}>{route.label}</StyledLink>
                 </MenuItem>
               ))}
             </Menu>
