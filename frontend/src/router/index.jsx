@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import HomePage from '../pages/HomePage';
 import UsersPage from '../features/users/pages/UsersPage';
 import PostsPage from '../features/posts/pages/PostsPage';
+import AboutPage from '../pages/AboutPage';
 
 // Route configuration
 export const routes = [
@@ -10,6 +11,12 @@ export const routes = [
     element: <HomePage />,
     label: 'Home',
     inNav: false,
+  },
+  {
+    path: '/about',
+    element: <AboutPage />,
+    label: 'About',
+    inNav: true,
   },
   {
     path: '/users',
