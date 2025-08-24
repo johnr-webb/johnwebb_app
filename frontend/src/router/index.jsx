@@ -13,23 +13,23 @@ export const routes = [
     inNav: false,
   },
   {
-    path: '/about',
-    element: <AboutPage />,
-    label: 'About',
-    inNav: true,
-  },
-  {
     path: '/users',
     element: <UsersPage />,
     label: 'Users',
-    inNav: true,
+    inNav: false,
   },
   {
     path: '/posts',
     element: <PostsPage />,
     label: 'Posts',
+    inNav: false,
+  },
+  {
+    path: '/about',
+    element: <AboutPage />,
+    label: 'About',
     inNav: true,
-  }
+  },
 ];
 
 // Navigation component
@@ -37,11 +37,7 @@ export const AppRoutes = () => {
   return (
     <Routes>
       {routes.map((route) => (
-        <Route
-          key={route.path}
-          path={route.path}
-          element={route.element}
-        />
+        <Route key={route.path} path={route.path} element={route.element} />
       ))}
     </Routes>
   );
