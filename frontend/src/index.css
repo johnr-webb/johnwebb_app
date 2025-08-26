@@ -6,8 +6,6 @@
 
 .main-content {
   flex: 1;
-  padding: calc(var(--spacing-unit) * 3);
-  max-width: 1280px;
   margin: 0 auto;
   width: 100%;
 }

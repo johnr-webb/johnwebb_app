@@ -48,13 +48,12 @@ const appTheme = createTheme({
       'sans-serif',
     ].join(','),
   },
-  spacing: 8, // Corresponds to your --spacing-unit
+  spacing: 8,
   shape: {
-    borderRadius: 8, // Corresponds to your --border-radius
+    borderRadius: 8,
   },
   transitions: {
     duration: {
-      // Corresponds to your --transition-speed of 0.3s
       standard: 300,
     },
   },

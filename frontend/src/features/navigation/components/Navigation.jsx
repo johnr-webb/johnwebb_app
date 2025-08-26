@@ -70,8 +70,9 @@ export const Navigation = () => {
 
   return (
     <AppBar
-      position="static"
+      position="sticky"
       sx={{
+        margin: '0 auto',
         backgroundColor: 'background.paper',
         borderBottom: 1,
         borderColor: 'divider',
