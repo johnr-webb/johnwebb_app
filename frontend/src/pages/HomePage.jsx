@@ -9,14 +9,15 @@ const HomePage = () => {
       {/* Hero Section: The Hero section will take over the whole screen */}
       <Box
         sx={{
-          height: '100vh',
+          height: '75vh',
           backgroundImage: `url(${mountainView})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           display: 'flex',
           flexDirection: 'column',
+          flexGrow: 1,
           justifyContent: 'top',
-          paddingTop: '10vh',
+          paddingTop: '5vh',
           paddingLeft: '25vw',
           alignItems: 'center',
           color: 'white',
@@ -27,15 +28,15 @@ const HomePage = () => {
         <Typography variant="h2" component="h1" gutterBottom>
           Welcome to my personal website
         </Typography>
-        <Typography variant="h5" component="p" sx={{ maxWidth: '600px' }}>
-          Welcome to my digital lab, where I explore the frontiers of technology, share my personal
-          projects, and document my journey.
+        <Typography variant="h5" component="p" sx={{ maxWidth: '575px' }}>
+          Welcome to a living workspace where I explore technology, share my projects, and document
+          my personal journeys.
         </Typography>
       </Box>
 
       {/* Main Content Section */}
       <Box sx={{ py: 8, px: 2, background: 'background.default' }}>
-        <Container maxWidth="md">
+        <Container>
           <Grid container spacing={4} sx={{ mt: 0 }}>
             {/* My Latest Experiments Box */}
             <Grid size={6}>
@@ -43,7 +44,7 @@ const HomePage = () => {
                 elevation={3}
                 sx={{
                   backgroundColor: 'background.paper',
-                  p: 4,
+                  padding: 4,
                   borderRadius: 2,
                   height: '100%',
                   display: 'flex',
@@ -54,10 +55,10 @@ const HomePage = () => {
                 }}
               >
                 <Typography variant="h4" component="h2" gutterBottom>
-                  My Latest Experiments
+                  Latest Experiments
                 </Typography>
-                <Typography variant="body1">
-                  Explore my portfolio of work, from web applications to open-source contributions.
+                <Typography variant="body1" marginBottom="1rem">
+                  Explore my portfolio of work, and documentation for recreating your own projects.
                 </Typography>
                 <Button variant="contained" component={Link} to="/projects">
                   View Projects
@@ -82,10 +83,11 @@ const HomePage = () => {
                 }}
               >
                 <Typography variant="h4" component="h2" gutterBottom>
-                  My Sandbox
+                  Blog Thoughts
                 </Typography>
-                <Typography variant="body1">
-                  Read my thoughts on software architecture, running, and anything else on my mind.
+                <Typography variant="body1" marginBottom="1rem">
+                  Read my thoughts on my technological journey, personal growth, and lessons
+                  learned.
                 </Typography>
                 <Button variant="contained" component={Link} to="/blog">
                   Read My Blog
