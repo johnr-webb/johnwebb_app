@@ -26,11 +26,10 @@ const HomePage = () => {
         }}
       >
         <Typography variant="h2" component="h1" gutterBottom>
-          Welcome to my personal website
+          Welcome to John Webb dot com
         </Typography>
-        <Typography variant="h5" component="p" sx={{ maxWidth: '575px' }}>
-          Welcome to a living workspace where I explore technology, share my projects, and document
-          my personal journeys.
+        <Typography variant="h5" component="p" sx={{ maxWidth: '60  0px' }}>
+          An evolving space for projects, thoughts, and more!
         </Typography>
       </Box>
 
@@ -38,6 +37,34 @@ const HomePage = () => {
       <Box sx={{ py: 8, px: 2, background: 'background.default' }}>
         <Container>
           <Grid container spacing={4} sx={{ mt: 0 }}>
+            <Grid size={12}>
+              <Paper
+                elevation={3}
+                sx={{
+                  backgroundColor: 'background.paper',
+                  padding: 2,
+                  borderRadius: 4,
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: 2,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  textAlign: 'left',
+                }}
+              >
+                <Typography variant="h4" component="h2" gutterBottom>
+                  Disclaimer!
+                </Typography>
+                <Typography variant="body1" marginBottom="1rem">
+                  There may frequently be broken links, half-finished projects, or incomplete
+                  thoughts. It's a work in progress! Don't be so selfish, it's not meant to be a
+                  finished product for you to consume. If you do find something specific, I
+                  encourage you to file your grievances here:{' '}
+                  <Link to="/complaints">complaints</Link>
+                </Typography>
+              </Paper>
+            </Grid>
             {/* My Latest Experiments Box */}
             <Grid size={6}>
               <Paper
@@ -55,7 +82,7 @@ const HomePage = () => {
                 }}
               >
                 <Typography variant="h4" component="h2" gutterBottom>
-                  Latest Experiments
+                  Experiments & Projects
                 </Typography>
                 <Typography variant="body1" marginBottom="1rem">
                   Explore my portfolio of work, and documentation for recreating your own projects.
@@ -83,14 +110,13 @@ const HomePage = () => {
                 }}
               >
                 <Typography variant="h4" component="h2" gutterBottom>
-                  Blog Thoughts
+                  My Thoughts
                 </Typography>
                 <Typography variant="body1" marginBottom="1rem">
-                  Read my thoughts on my technological journey, personal growth, and lessons
-                  learned.
+                  My thoughts on my technological journey, personal growth, and lessons learned.
                 </Typography>
-                <Button variant="contained" component={Link} to="/blog">
-                  Read My Blog
+                <Button variant="contained" component={Link} to="/my-thoughts">
+                  Read My Thoughts
                 </Button>
               </Paper>
             </Grid>
