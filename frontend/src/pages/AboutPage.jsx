@@ -10,7 +10,7 @@ const AboutPage = () => {
     finding simple solutions to complex problems. I currently work at Citi Bank on the Cloud Threat
     Informed Defense team, where I focus on the tools and processes that help prevent, detect, and
     remediate threats. With a background in computer science and Economics from the University of
-    Michigan, I am finding my passion in examining team dynamics and, of course, DevSecOps.
+    Michigan, I am finding my passion in examining team dynamics and developer productivity.
   `;
 
   const aboutMeText2 = `
