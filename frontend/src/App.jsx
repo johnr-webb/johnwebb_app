@@ -5,6 +5,7 @@ import { AppRoutes } from './router';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import appTheme from './theme';
+import ErrorBoundary from './components/ErrorBoundary';
 import './index.css';
 
 function App() {
@@ -15,16 +16,18 @@ function App() {
   const shouldRenderFooter = showFooterPaths.includes(location.pathname);
 
   return (
-    <ThemeProvider theme={appTheme}>
-      <CssBaseline />
-      <div className="app-container">
-        <Navigation />
-        <main className="main-content">
-          <AppRoutes />
-        </main>
-        {shouldRenderFooter && <Footer />}
-      </div>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider theme={appTheme}>
+        <CssBaseline />
+        <div className="app-container">
+          <Navigation />
+          <main className="main-content">
+            <AppRoutes />
+          </main>
+          {shouldRenderFooter && <Footer />}
+        </div>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 

@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import { 
-    getUsers, 
-    getUser as getUserApi,
-    createUser as createUserApi,
-    updateUser as updateUserApi,
-    deleteUser as deleteUserApi 
+import { useState, useEffect, useCallback } from 'react';
+import {
+  getUsers,
+  getUser as getUserApi,
+  createUser as createUserApi,
+  updateUser as updateUserApi,
+  deleteUser as deleteUserApi,
 } from '../api/usersApi';
 
 export const useUsers = () => {
@@ -27,63 +27,58 @@ export const useUsers = () => {
     fetchUsers();
   }, []);
 
-  useEffect(() => {
-    console.log('Users state changed:', users);
-  }, [users]);
-
-  const createUser = async (userData) => {
+  const createUser = useCallback(async (userData) => {
     try {
       setLoading(true);
-      console.log('Creating user with:', userData);
       const newUser = await createUserApi(userData);
-      console.log('New user created:', newUser);
-      console.log('setUsers!');
-      setUsers(prevUsers => [...prevUsers, newUser]);
-      console.log([...prevUsers, newUser]);
+      setUsers((prevUsers) => [...prevUsers, newUser]);
       setLoading(false);
     } catch (err) {
       setError(err.message);
       setLoading(false);
     }
-  };
+  }, []);
 
-  const updateUser = async (userId, userData) => {
+  const updateUser = useCallback(async (userId, userData) => {
     try {
       setLoading(true);
       const updatedUser = await updateUserApi(userId, userData);
-      setUsers(prevUsers =>
-        prevUsers.map(user => (user.id === userId ? updatedUser : user))
-      );
+      setUsers((prevUsers) => prevUsers.map((user) => (user.id === userId ? updatedUser : user)));
       setLoading(false);
     } catch (err) {
       setError(err.message);
       setLoading(false);
     }
-  };
+  }, []);
 
-  const deleteUser = async (userId) => {
+  const deleteUser = useCallback(async (userId) => {
     try {
       setLoading(true);
       await deleteUserApi(userId);
-      setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
       setLoading(false);
     } catch (err) {
       setError(err.message);
       setLoading(false);
     }
-  };
-  const getUser = async (userId) => {
+  }, []);
+
+  const getUser = useCallback(async (userId) => {
     try {
       setLoading(true);
       const user = await getUserApi(userId);
       setLoading(false);
-      return user; // Return the fetched user
+      return user;
     } catch (err) {
       setError(err.message);
       setLoading(false);
-      return null; // Or handle the error as needed
+      return null;
     }
-  };
+  }, []);
+
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
 
   return {
     users,
@@ -93,5 +88,6 @@ export const useUsers = () => {
     updateUser,
     deleteUser,
     getUser,
+    clearError,
   };
 };

@@ -28,7 +28,7 @@ const HomePage = () => {
         <Typography variant="h2" component="h1" gutterBottom>
           Welcome to John Webb dot com
         </Typography>
-        <Typography variant="h5" component="p" sx={{ maxWidth: '60  0px' }}>
+        <Typography variant="h5" component="p" sx={{ maxWidth: '600px' }}>
           An evolving space for projects, thoughts, and more!
         </Typography>
       </Box>
@@ -56,7 +56,7 @@ const HomePage = () => {
                 <Typography variant="h4" component="h2" gutterBottom>
                   Disclaimer!
                 </Typography>
-                <Typography variant="body1" marginBottom="1rem">
+                <Typography variant="body1" sx={{ mb: 2 }}>
                   There may frequently be broken links, half-finished projects, or incomplete
                   thoughts. It's a work in progress! Don't be so selfish, it's not meant to be a
                   finished product for you to consume. If you do find something specific, I
@@ -66,7 +66,7 @@ const HomePage = () => {
               </Paper>
             </Grid>
             {/* My Latest Experiments Box */}
-            <Grid size={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Paper
                 elevation={3}
                 sx={{
@@ -84,7 +84,7 @@ const HomePage = () => {
                 <Typography variant="h4" component="h2" gutterBottom>
                   Experiments & Projects
                 </Typography>
-                <Typography variant="body1" marginBottom="1rem">
+                <Typography variant="body1" sx={{ mb: 2 }}>
                   Explore my portfolio of work, and documentation for recreating your own projects.
                 </Typography>
                 <Button variant="contained" component={Link} to="/projects">
@@ -94,7 +94,7 @@ const HomePage = () => {
             </Grid>
 
             {/* My Sandbox Box */}
-            <Grid size={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Paper
                 elevation={3}
                 sx={{
@@ -112,7 +112,7 @@ const HomePage = () => {
                 <Typography variant="h4" component="h2" gutterBottom>
                   My Thoughts
                 </Typography>
-                <Typography variant="body1" marginBottom="1rem">
+                <Typography variant="body1" sx={{ mb: 2 }}>
                   My thoughts on my technological journey, personal growth, and lessons learned.
                 </Typography>
                 <Button variant="contained" component={Link} to="/my-thoughts">
