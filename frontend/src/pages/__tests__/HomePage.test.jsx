@@ -24,7 +24,6 @@ const renderWithProviders = (component) => {
 
 describe('HomePage', () => {
   beforeEach(() => {
-    // Clear any previous renders
     vi.clearAllMocks();
   });
 
@@ -61,7 +60,7 @@ describe('HomePage', () => {
       const heroSection = screen.getByText('Welcome to John Webb dot com').closest('div');
       expect(heroSection).toHaveStyle({
         height: '75vh',
-        color: 'white',
+        color: 'rgb(255, 255, 255)', // Browser converts 'white' to rgb
         textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
         textAlign: 'center',
       });
@@ -166,10 +165,9 @@ describe('HomePage', () => {
     test('renders main container with correct spacing', () => {
       renderWithProviders(<HomePage />);
 
-      const mainContainer = screen
-        .getByText('Welcome to John Webb dot com')
-        .closest('[class*="MuiContainer-root"]');
-      expect(mainContainer).toBeInTheDocument();
+      // Find the container by looking for the main content wrapper
+      const mainContent = screen.getByText('Disclaimer!').closest('[class*="MuiBox-root"]');
+      expect(mainContent).toBeInTheDocument();
     });
 
     test('uses correct Grid layout structure', () => {

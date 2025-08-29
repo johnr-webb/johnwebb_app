@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { createTheme } from '@mui/material/styles';
+import { describe, test, expect, beforeEach, vi } from 'vitest';
 import ComplaintsPage from '../ComplaintsPage';
 
 // Create a basic theme for testing
@@ -18,7 +19,7 @@ const renderWithProviders = (component) => {
 
 describe('ComplaintsPage', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Main Content', () => {

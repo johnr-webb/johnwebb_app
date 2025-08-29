@@ -28,7 +28,7 @@ A modern, responsive React application showcasing my professional journey, proje
 ### Development Tools
 
 - **ESLint 9.25.0** - Code quality and consistency
-- **Jest 29.7.0** - Comprehensive testing framework
+- **Vitest 2.1.8** - Fast unit testing framework
 - **Testing Library** - React component testing utilities
 
 ### API & Data
@@ -62,7 +62,7 @@ src/
 ├── services/           # API and external services
 │   └── apiClient.js
 ├── theme.js            # Material-UI theme configuration
-└── setupTests.js       # Jest testing setup
+└── setupTests.js       # Vitest testing setup
 ```
 
 ## 🚀 Getting Started
