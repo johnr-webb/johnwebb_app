@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import { 
-    getPosts, 
-    getPost as getPostApi,
-    createPost as createPostApi,
-    updatePost as updatePostApi,
-    deletePost as deletePostApi 
+import { useState, useEffect, useCallback } from 'react';
+import {
+  getPosts,
+  getPost as getPostApi,
+  createPost as createPostApi,
+  updatePost as updatePostApi,
+  deletePost as deletePostApi,
 } from '../api/postsApi';
 
 export const usePosts = () => {
@@ -27,56 +27,58 @@ export const usePosts = () => {
     fetchPosts();
   }, []);
 
-  const createPost = async (postData) => {
+  const createPost = useCallback(async (postData) => {
     try {
       setLoading(true);
       const newPost = await createPostApi(postData);
-      setPosts(prevPosts => [...prevPosts, newPost]);
+      setPosts((prevPosts) => [...prevPosts, newPost]);
       setLoading(false);
     } catch (err) {
       setError(err.message);
       setLoading(false);
     }
-  };
+  }, []);
 
-  const updatePost = async (postId, postData) => {
+  const updatePost = useCallback(async (postId, postData) => {
     try {
       setLoading(true);
       const updatedPost = await updatePostApi(postId, postData);
-      setPosts(prevPosts =>
-        prevPosts.map(post => (post.id === postId ? updatedPost : post))
-      );
+      setPosts((prevPosts) => prevPosts.map((post) => (post.id === postId ? updatedPost : post)));
       setLoading(false);
     } catch (err) {
       setError(err.message);
       setLoading(false);
     }
-  };
+  }, []);
 
-  const deletePost = async (postId) => {
+  const deletePost = useCallback(async (postId) => {
     try {
       setLoading(true);
       await deletePostApi(postId);
-      setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+      setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
       setLoading(false);
     } catch (err) {
       setError(err.message);
       setLoading(false);
     }
-  };
+  }, []);
 
-    const getPost = async (postId) => {
+  const getPost = useCallback(async (postId) => {
     try {
       setLoading(true);
       const post = await getPostApi(postId);
       setLoading(false);
-      return post; // Return the fetched post
+      return post;
     } catch (err) {
       setError(err.message);
       setLoading(false);
-      return null; // Or handle the error as needed
+      return null;
     }
-  };
+  }, []);
+
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
 
   return {
     posts,
@@ -85,6 +87,7 @@ export const usePosts = () => {
     createPost,
     updatePost,
     deletePost,
-        getPost
+    getPost,
+    clearError,
   };
 };
