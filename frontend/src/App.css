@@ -4,6 +4,8 @@
   text-align: center;
 }
 
+/* UNUSED CODE - Commented out since components use Material-UI instead */
+
 /* Larger max-width for big monitors */
 /* @media (min-width: 1400px) {
   :root {
@@ -18,7 +20,8 @@
   }
 } */
 
-.logo {
+/* Logo styles - not used in current app */
+/* .logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
@@ -29,8 +32,9 @@
 }
 .logo.react:hover {
   filter: drop-shadow(0 0 2em var(--secondary-color));
-}
+} */
 
+/* Logo animation - not used */
 /* @keyframes logo-spin {
   from {
     transform: rotate(0deg);
@@ -40,19 +44,22 @@
   }
 } */
 
-@media (prefers-reduced-motion: no-preference) {
+/* Logo animation media query - not used */
+/* @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
   }
-}
+} */
 
-.card {
+/* Card styles - not used, components use Material-UI Card */
+/* .card {
   padding: 2em;
   background-color: var(--background-color-alt);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-}
+} */
 
-.read-the-docs {
+/* Read the docs - not used */
+/* .read-the-docs {
   color: var(--text-color-light);
-}
+} */

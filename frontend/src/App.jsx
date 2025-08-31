@@ -4,9 +4,9 @@ import Footer from './features/footer/components/Footer';
 import { AppRoutes } from './router';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { Box } from '@mui/material';
 import appTheme from './theme';
 import ErrorBoundary from './components/ErrorBoundary';
-import './index.css';
 
 function App() {
   const location = useLocation();
@@ -19,13 +19,13 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider theme={appTheme}>
         <CssBaseline />
-        <div className="app-container">
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
           <Navigation />
-          <main className="main-content">
+          <Box component="main" sx={{ margin: '0 auto', width: '100%' }}>
             <AppRoutes />
-          </main>
+          </Box>
           {shouldRenderFooter && <Footer />}
-        </div>
+        </Box>
       </ThemeProvider>
     </ErrorBoundary>
   );
