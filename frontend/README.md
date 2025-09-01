@@ -283,5 +283,3 @@ This project is open source and available under the [MIT License](LICENSE).
 - **LinkedIn**: [John Webb](https://www.linkedin.com/in/john-webb-643346170/)
 
 ---
-
-_Built with ❤️ and modern web technologies_
