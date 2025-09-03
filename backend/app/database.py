@@ -1,8 +1,10 @@
 # database.py
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-from app.config import settings
 import logging
+
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.ext.declarative import declarative_base
+
+from app.config import settings
 
 # Async Database URL
 DATABASE_URL = settings.database_url
@@ -11,12 +13,11 @@ DATABASE_URL = settings.database_url
 engine = create_async_engine(DATABASE_URL, echo=True)
 
 # Create an async session factory
-AsyncSessionLocal = async_sessionmaker(
-    bind=engine
-)
+AsyncSessionLocal = async_sessionmaker(bind=engine)
 
 # SQLAlchemy setup for ORM models
 Base = declarative_base()
+
 
 # Dependency to get DB session
 async def get_db():

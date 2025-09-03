@@ -1,8 +1,8 @@
-name: Test and Lint
+name: Lint and Test
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
     branches: [main]
 
@@ -21,23 +21,21 @@ jobs:
       - name: Install backend dependencies
         run: |
           cd backend
-          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Lint backend code
+        run: |
+          cd backend
+          # Run linting
+          isort --check-only app/
+          black --check app/
+          flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
 
       - name: Run backend tests
         run: |
           cd backend
           # Add your test command here when tests are available
           echo "Backend tests would run here"
-
-      - name: Lint backend code
-        run: |
-          cd backend
-          # Install linting tools if needed
-          pip install flake8 black isort
-          # Run linting
-          flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
-          black --check app/
-          isort --check-only app/
 
   frontend-tests:
     runs-on: ubuntu-latest
