@@ -50,6 +50,9 @@ jobs:
           command: up
           stack-name: dev
           work-dir: infra
+          config-map: |
+            gcp:project: ${{ env.GCP_PROJECT_ID }}
+            region: ${{ env.GCP_REGION }}
 
       - name: Echo infrastructure deployment status
         run: |
