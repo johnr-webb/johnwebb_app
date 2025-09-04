@@ -7,8 +7,8 @@ import json
 import os
 
 # Configuration
-config = pulumi.Config()
-project_id = config.require("gcp:project")
+config = pulumi.Config("gcp")
+project_id = config.require("project")
 region = config.get("region") or "us-central1"
 
 # Create a service account for Cloud Run
