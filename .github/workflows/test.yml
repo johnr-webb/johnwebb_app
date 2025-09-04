@@ -2,7 +2,7 @@ name: Lint and Test
 
 on:
   push:
-    branches: [main]
+    branches: [main, feat/deployment]
   pull_request:
     branches: [main]
 
