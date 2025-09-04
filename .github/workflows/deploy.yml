@@ -49,7 +49,7 @@ jobs:
         with:
           command: up
           stack-name: dev
-          working-directory: infra
+          work-dir: infra
 
       - name: Echo infrastructure deployment status
         run: |
