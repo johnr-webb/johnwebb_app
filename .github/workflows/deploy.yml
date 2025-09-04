@@ -15,7 +15,7 @@ env:
 jobs:
   deploy-infrastructure:
     runs-on: ubuntu-latest
-    if: success() && github.event.workflow_run.conclusion == 'success'
+    if: success() && github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.head_branch == 'main' || github.event.workflow_run.head_branch == 'feat/deployment')
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
