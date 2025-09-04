@@ -55,9 +55,6 @@ jobs:
           command: up
           stack-name: dev
           work-dir: infra
-          config-map: |
-            johnwebb_app_infra:gcp:project: jrw-demo-project
-            johnwebb_app_infra:region: us-central1
 
       - name: Echo infrastructure deployment status
         run: |

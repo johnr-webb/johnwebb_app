@@ -1,2 +1,3 @@
 config:
-  gcp:project: jrw-demo-project
+  johnwebb_app_infra:gcp:project: jrw-demo-project
+  johnwebb_app_infra:gcp:region: us-central1
