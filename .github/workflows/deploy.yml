@@ -26,9 +26,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install Pulumi
-        uses: pulumi/actions@v4
-        with:
-          command: install
+        uses: pulumi/actions@v6
 
       - name: Configure GCP credentials
         uses: google-github-actions/auth@v2
@@ -44,12 +42,18 @@ jobs:
           pip install -r requirements.txt
 
       - name: Deploy infrastructure
-        working-directory: infra
-        run: |
-          pulumi stack select dev
-          pulumi up --yes
+        uses: pulumi/actions@v6
+        id: pulumi
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+        with:
+          command: up
+          stack-name: dev
+          working-directory: infra
+
+      - name: Echo infrastructure deployment status
+        run: |
+          echo "Infrastructure deployed successfully!"
 
   build-and-deploy-backend:
     needs: [deploy-infrastructure]
