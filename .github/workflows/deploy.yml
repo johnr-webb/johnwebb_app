@@ -51,8 +51,8 @@ jobs:
           stack-name: dev
           work-dir: infra
           config-map: |
-            gcp:project: ${{ env.GCP_PROJECT_ID }}
-            region: ${{ env.GCP_REGION }}
+            johnwebb_app_infra:gcp:project: ${{ env.GCP_PROJECT_ID }}
+            johnwebb_app_infra:region: ${{ env.GCP_REGION }}
 
       - name: Echo infrastructure deployment status
         run: |
