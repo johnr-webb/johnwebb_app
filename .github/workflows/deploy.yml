@@ -1,9 +1,9 @@
 name: Deploy to GCP
 
 on:
-  push:
-    branches: [main, develop]
-  pull_request:
+  workflow_run:
+    workflows: ["Lint and Test"]
+    types: [completed]
     branches: [main]
 
 env:
@@ -13,54 +13,9 @@ env:
   FRONTEND_BUCKET_NAME: johnwebb-app-frontend-dev
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install backend dependencies
-        run: |
-          cd backend
-          pip install -r requirements.txt
-
-      - name: Install frontend dependencies
-        run: |
-          cd frontend
-          npm ci
-
-      - name: Run backend tests
-        run: |
-          cd backend
-          # Add your test command here when tests are available
-          echo "Backend tests would run here"
-
-      - name: Run frontend tests
-        run: |
-          cd frontend
-          npm run test:ci
-
-      - name: Lint frontend
-        run: |
-          cd frontend
-          npm run lint
-
   deploy-infrastructure:
-    needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: success() && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -84,22 +39,21 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Install Pulumi dependencies
+        working-directory: infra
         run: |
-          cd infra
           pip install -r requirements.txt
 
       - name: Deploy infrastructure
+        working-directory: infra
         run: |
-          cd infra
           pulumi stack select dev
           pulumi up --yes
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
   build-and-deploy-backend:
-    needs: [test, deploy-infrastructure]
+    needs: [deploy-infrastructure]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -116,12 +70,13 @@ jobs:
         run: gcloud auth configure-docker
 
       - name: Build and push backend image
+        working-directory: backend
         run: |
-          cd backend
           docker build -t gcr.io/$GCP_PROJECT_ID/$BACKEND_SERVICE_NAME:$GITHUB_SHA .
           docker push gcr.io/$GCP_PROJECT_ID/$BACKEND_SERVICE_NAME:$GITHUB_SHA
 
       - name: Deploy to Cloud Run
+        working-directory: backend
         run: |
           gcloud run deploy $BACKEND_SERVICE_NAME \
             --image gcr.io/$GCP_PROJECT_ID/$BACKEND_SERVICE_NAME:$GITHUB_SHA \
@@ -133,19 +88,11 @@ jobs:
             --max-instances 10
 
   build-and-deploy-frontend:
-    needs: [test, deploy-infrastructure]
+    needs: [deploy-infrastructure]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
 
       - name: Configure GCP credentials
         uses: google-github-actions/auth@v2
@@ -160,17 +107,27 @@ jobs:
         with:
           command: install
 
-      - name: Install frontend dependencies
-        run: |
-          cd frontend
-          npm ci
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
 
-      - name: Build frontend
+      - name: Get backend URL
         run: |
-          cd frontend
+          BACKEND_URL=$(gcloud run services describe ${{ env.BACKEND_SERVICE_NAME }} \
+            --project=${{ env.GCP_PROJECT_ID }} \
+            --region=${{ env.GCP_REGION }} \
+            --platform=managed \
+            --format="value(status.url)")
+          echo "VITE_API_BASE_URL=$BACKEND_URL" >> $GITHUB_ENV
+
+      - name: Install frontend dependencies and build
+        working-directory: frontend
+        run: |
+          npm ci
           npm run build
-        env:
-          VITE_API_BASE_URL: ${{ secrets.BACKEND_URL }}
 
       - name: Deploy to Cloud Storage
         run: |
