@@ -1,7 +1,7 @@
 // src/components/Navigation.jsx
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import { routes } from '../../../router';
+import { routes } from '../../../router/routes';
 import {
   AppBar,
   Toolbar,

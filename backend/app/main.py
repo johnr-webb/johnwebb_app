@@ -2,18 +2,23 @@
 
 import logging
 import sys
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
+
+from app.config import settings
+from app.database import Base, engine  # Import engine and Base
 from app.routers.posts import router as posts_router
 from app.routers.users import router as users_router
-from app.database import engine, Base # Import engine and Base
-from app.config import settings
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG if settings.debug == "DEBUG" else logging.INFO)
+logging.basicConfig(
+    stream=sys.stdout,
+    level=logging.DEBUG if settings.debug == "DEBUG" else logging.INFO,
+)
 
 logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -23,6 +28,7 @@ async def lifespan(app: FastAPI):
     yield
     # Shutdown
     await engine.dispose()
+
 
 app = FastAPI(lifespan=lifespan)
 
@@ -34,13 +40,16 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
+
 @app.get("/")
 async def read_root():
     return {"message": "Hello, World!"}
 
+
 @app.get("/hello/{name}")
 async def say_hello(name: str):
     return {"message": f"Hello, {name}!"}
+
 
 # Routers
 app.include_router(users_router)

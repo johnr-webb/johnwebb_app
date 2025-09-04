@@ -1,22 +1,26 @@
 # schemas/posts.py
 
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel
-    
+
+
 class PostBase(BaseModel):
     content: str
     title: str
 
+
 class PostCreate(PostBase):
     pass
+
 
 class PostUpdate(BaseModel):
     content: Optional[str] = None
     title: Optional[str] = None
     published: Optional[bool] = None
-    
+
+
 class Post(PostBase):
     id: int
     published: bool

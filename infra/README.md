@@ -1,77 +1,159 @@
-# Pulumi GCP Python Storage Bucket Template
+# Infrastructure as Code with Pulumi
 
- A minimal Pulumi template for provisioning a Google Cloud Storage bucket using Python.
+This directory contains the Pulumi infrastructure code for deploying the johnwebb_app to Google Cloud Platform.
 
- This template helps you get started with Pulumi and the `pulumi-gcp` provider to create a simple storage bucket and export its URL.
+> 📖 **For complete deployment instructions, see the [Deployment Guide](../docs/deployment.md)**
 
- ## When to Use
+## What's Deployed
 
- - You need a quick example of using Pulumi with Google Cloud in Python.
- - You want to manage a Google Cloud Storage bucket as code.
- - You’re looking for a minimal scaffold to build more complex GCP infrastructure.
+- **Cloud SQL PostgreSQL**: Database for the FastAPI backend
+- **Cloud Run**: Serverless container platform for the FastAPI backend
+- **Cloud Storage**: Bucket for hosting the React frontend static files
+- **Service Accounts**: IAM roles and permissions for secure access
+- **Networking**: VPC and firewall rules (if needed)
 
- ## Prerequisites
+## Prerequisites
 
- - A Google Cloud account and a target GCP project.
- - Authentication set up via `gcloud auth login` or the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
- - Python 3.7 or later installed on your machine.
- - Pulumi CLI installed and logged in to your Pulumi account.
+1. Install Pulumi CLI: https://www.pulumi.com/docs/get-started/install/
+2. Install Python 3.11+
+3. Set up GCP credentials
+4. Install dependencies: `pip install -r requirements.txt`
 
- ## Usage
+## Quick Start
 
- Run the following command to scaffold a new project from this template:
+1. **Login to Pulumi**:
 
- ```bash
- pulumi new gcp-python
- ```
+   ```bash
+   pulumi login
+   ```
 
- Follow the interactive prompts:
- - **Project Name**: Your project name.
- - **Project Description**: A short description of your project.
- - **gcp:project**: The ID of the Google Cloud project where resources will be created.
+2. **Set up GCP project**:
 
- After the project is generated, navigate into your project directory and deploy:
+   ```bash
+   pulumi config set gcp:project jrw-demo-project
+   ```
 
- ```bash
- cd <project-name>
- pulumi up
- ```
+3. **Deploy infrastructure**:
 
- Confirm the changes to provision your storage bucket.
+   ```bash
+   pulumi up
+   ```
 
- ## Project Layout
+4. **View outputs**:
+   ```bash
+   pulumi stack output
+   ```
 
- ```
- .
- ├── __main__.py        # Pulumi program defining resources
- ├── Pulumi.yaml        # Project configuration and template metadata
- └── requirements.txt   # Python dependencies for Pulumi and GCP
- ```
+## Configuration
 
- ## Configuration
+### Required Configuration
 
- - **gcp:project**: (Required) The Google Cloud project ID where resources will be created.
+- `gcp:project`: Your GCP project ID
 
- ## Resources Created
+### Optional Configuration
 
- - **Storage Bucket** (`pulumi_gcp.storage.Bucket`): A bucket named `my-bucket` in the `US` location.
+- `region`: GCP region (defaults to us-central1)
 
- ## Outputs
+### Setting Configuration
 
- - **bucket_name**: The URL of the created storage bucket.
+```bash
+# Set project
+pulumi config set gcp:project your-project-id
 
- ## Next Steps
+# Set region
+pulumi config set region us-west1
 
- - Modify `__main__.py` to customize the bucket:
-   - Change the bucket name.
-   - Adjust the `location` or add bucket labels and IAM policies.
- - Add more GCP resources such as Pub/Sub topics, Compute instances, or BigQuery datasets.
- - Integrate with CI/CD pipelines using `pulumi preview` and `pulumi up --yes`.
- - Explore the [Pulumi GCP Provider Documentation](https://www.pulumi.com/registry/packages/gcp/) for more examples.
+# View current configuration
+pulumi config
+```
 
- ## Need Help?
+## Stack Management
 
- - Pulumi Docs: https://www.pulumi.com/docs/
- - GCP Provider Docs: https://www.pulumi.com/registry/packages/gcp/
- - Community Slack: https://slack.pulumi.com/
- - GitHub Issues: https://github.com/pulumi/pulumi/issues
+### Create a new stack
+
+```bash
+pulumi stack init production
+```
+
+### Switch between stacks
+
+```bash
+pulumi stack select dev
+pulumi stack select production
+```
+
+### List all stacks
+
+```bash
+pulumi stack ls
+```
+
+## Common Commands
+
+```bash
+# Preview changes
+pulumi preview
+
+# Deploy changes
+pulumi up
+
+# Destroy infrastructure
+pulumi destroy
+
+# View stack outputs
+pulumi stack output
+
+# View stack history
+pulumi history
+
+# Export stack state
+pulumi stack export --file backup.json
+```
+
+## Outputs
+
+After deployment, the following outputs are available:
+
+- `frontend_bucket_name`: Name of the Cloud Storage bucket for frontend
+- `frontend_bucket_url`: URL of the frontend bucket
+- `cloud_run_service_url`: URL of the deployed FastAPI backend
+- `database_connection_name`: Cloud SQL connection name
+- `database_public_ip`: Public IP of the database (if applicable)
+- `service_account_email`: Email of the created service account
+
+## Security Notes
+
+- Database password is currently hardcoded - use Pulumi secrets in production
+- Cloud Run service allows unauthenticated access - restrict as needed
+- Consider using private IP for Cloud SQL in production
+
+## Cost Considerations
+
+- Cloud SQL instance uses `db-f1-micro` (smallest tier)
+- Cloud Run has request-based pricing
+- Cloud Storage has minimal costs for static hosting
+- Monitor usage in GCP Console
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Permission denied errors**
+
+   - Ensure your GCP credentials have sufficient permissions
+   - Check that required APIs are enabled
+
+2. **Resource already exists**
+
+   - Use `pulumi import` to import existing resources
+   - Or change resource names in the code
+
+3. **Database connection issues**
+   - Verify Cloud SQL instance is running
+   - Check firewall rules and network configuration
+
+### Getting Help
+
+- Pulumi documentation: https://www.pulumi.com/docs/
+- GCP Pulumi provider docs: https://www.pulumi.com/registry/packages/gcp/
+- Check Pulumi community forum for common issues
