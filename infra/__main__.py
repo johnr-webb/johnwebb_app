@@ -1,7 +1,7 @@
 """A Google Cloud Python Pulumi program for johnwebb_app deployment"""
 
 import pulumi
-from pulumi_gcp import storage, cloudrun, sql, projects, serviceaccount, iam
+from pulumi_gcp import storage, cloudrunv2, sql, projects, serviceaccount
 import pulumi_docker as docker
 import json
 import os
@@ -78,70 +78,57 @@ bucket_iam = storage.BucketIAMBinding(
     members=["allUsers"]
 )
 
-# Create Cloud Run service for FastAPI backend
-cloud_run_service = cloudrun.Service(
+cloud_run_service = cloudrunv2.Service(
     "fastapi-service",
     name="johnwebb-app-backend",
     location=region,
-    template=cloudrun.ServiceTemplateArgs(
-        spec=cloudrun.ServiceTemplateSpecArgs(
-            containers=[
-                cloudrun.ServiceTemplateSpecContainerArgs(
-                    image="gcr.io/cloudrun/hello",  # Placeholder - will be updated by CI/CD
-                    ports=[cloudrun.ServiceTemplateSpecContainerPortArgs(
-                        container_port=8000
+    deletion_protection=False,
+    ingress="INGRESS_TRAFFIC_ALL",
+    template=cloudrunv2.ServiceTemplateArgs(
+        containers=[
+            cloudrunv2.ServiceTemplateContainerArgs(
+                image="gcr.io/cloudrun/hello",  # Replace with your FastAPI Docker image
+                ports=cloudrunv2.ServiceTemplateContainerPortsArgs(
+                    container_port=8000
+                ),
+                envs=[
+                    cloudrunv2.ServiceTemplateContainerEnvArgs(
+                        name="DATABASE_URL",
+                        value=f"postgresql://{db_user.name}:{db_user.password}@{db_instance.connection_name}/johnwebb_app"
+                    ),
+                    cloudrunv2.ServiceTemplateContainerEnvArgs(
+                        name="DEBUG",
+                        value="false"
                     )],
-                    envs=[
-                        cloudrun.ServiceTemplateSpecContainerEnvArgs(
-                            name="DATABASE_URL",
-                            value=f"postgresql://{db_user.name}:{db_user.password}@{db_instance.connection_name}/johnwebb_app"
-                        ),
-                        cloudrun.ServiceTemplateSpecContainerEnvArgs(
-                            name="DEBUG",
-                            value="false"
-                        )
-                    ],
-                    resources=cloudrun.ServiceTemplateSpecContainerResourcesArgs(
-                        limits={"memory": "512Mi", "cpu": "1000m"}
-                    )
+                resources=cloudrunv2.ServiceTemplateContainerResourcesArgs(
+                    limits={"memory": "512Mi", "cpu": "1000m"}
                 )
-            ],
-            service_account_name=service_account.email,
-            timeout_seconds=300
-        ),
-        metadata=cloudrun.ServiceTemplateMetadataArgs(
-            annotations={
-                "autoscaling.knative.dev/maxScale": "10",
-                "run.googleapis.com/cloudsql-instances": db_instance.connection_name
-            }
-        )
-    ),
-    traffics=[cloudrun.ServiceTrafficArgs(
-        percent=100,
-        latest_revision=True
-    )]
+            )
+        ],
+        service_account=service_account.email,
+        timeout="300s",
+    )
 )
 
 # Allow unauthenticated access to Cloud Run service
-cloud_run_iam = iam.IAMBinding(
+cloud_run_iam = cloudrunv2.ServiceIamMember(
     "cloudrun-iam",
     role="roles/run.invoker",
-    members=["allUsers"],
-    resource=cloud_run_service.name
+    member="allUsers",
+    name=cloud_run_service.name
 )
 
-# Grant Cloud Run service account access to Cloud SQL
-cloud_sql_client = iam.IAMMember(
-    "cloudrun-sql-client",
+# Grant the Cloud SQL Client role to the service account
+sql_access_iam_binding = projects.IAMMember("cloudrun-sql-client",
     role="roles/cloudsql.client",
     member=service_account.email.apply(lambda email: f"serviceAccount:{email}"),
-    resource=db_instance.name
+    project=project_id
 )
 
 # Export important values
 pulumi.export("frontend_bucket_name", frontend_bucket.name)
 pulumi.export("frontend_bucket_url", frontend_bucket.url)
-pulumi.export("cloud_run_service_url", cloud_run_service.statuses[0].url)
+pulumi.export("cloud_run_service_url", cloud_run_service.traffic_statuses[0].url)
 pulumi.export("database_connection_name", db_instance.connection_name)
 pulumi.export("database_public_ip", db_instance.public_ip_address)
 pulumi.export("service_account_email", service_account.email)
