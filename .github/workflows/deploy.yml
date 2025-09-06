@@ -54,6 +54,7 @@ jobs:
           command: up
           stack-name: dev
           work-dir: infra
+          debug: true
 
       - name: Echo infrastructure deployment status
         run: |

@@ -6,6 +6,8 @@ runtime:
     toolchain: pip
     virtualenv: venv
 config:
+  gcp:project: jrw-demo-project
+  gcp:region: us-central1
   pulumi:tags:
     value:
       pulumi:template: gcp-python
