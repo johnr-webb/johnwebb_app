@@ -15,13 +15,8 @@ node_modules/
 *.bak
 *.log
 *.tmp
-Pulumi.*
 __pycache__/
 *.pyc
-
-# State files (do not ignore Pulumi.<stack>.yaml)
-Pulumi.yaml
-Pulumi.lock.yaml
 
 # Editor directories and files
 .vscode/
