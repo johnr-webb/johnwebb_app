@@ -130,7 +130,7 @@ sql_access_iam_binding = projects.IAMMember("cloudrun-sql-client",
 # Export important values
 pulumi.export("frontend_bucket_name", frontend_bucket.name)
 pulumi.export("frontend_bucket_url", frontend_bucket.url)
-pulumi.export("cloud_run_service_url", cloud_run_service.traffic_statuses[0].url)
+pulumi.export("cloud_run_service_url", cloud_run_service.traffic_statuses[0].uri)
 pulumi.export("database_connection_name", db_instance.connection_name)
 pulumi.export("database_public_ip", db_instance.public_ip_address)
 pulumi.export("service_account_email", service_account.email)

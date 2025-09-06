@@ -1,4 +1,4 @@
-name: johnwebb_app_infra
+name: johnwebb_app_infrastructure
 description: Web app infrastructure
 runtime:
   name: python
