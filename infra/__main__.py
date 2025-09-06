@@ -1,6 +1,7 @@
 """A Google Cloud Python Pulumi program for johnwebb_app deployment"""
 
 import pulumi
+from pulumi import Config
 from pulumi_gcp import storage, cloudrunv2, sql, projects, serviceaccount
 import pulumi_docker as docker
 import json
@@ -8,7 +9,7 @@ import os
 
 # Configuration
 pulumi_project = pulumi.get_project()
-config = pulumi.Config()
+config = Config("gcp")
 project_id = config.require("project")
 region = config.get("region") or "us-central1"
 
