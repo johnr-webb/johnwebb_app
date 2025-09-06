@@ -8,7 +8,7 @@ import os
 
 # Configuration
 pulumi_project = pulumi.get_project()
-config = pulumi.Config("gcp")
+config = pulumi.Config()
 project_id = config.require("project")
 region = config.get("region") or "us-central1"
 
