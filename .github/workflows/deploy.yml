@@ -76,19 +76,21 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Configure Docker to use gcloud as a credential helper
-        run: gcloud auth configure-docker
+        run: gcloud auth configure-docker $GCP_REGION-docker.pkg.dev
 
       - name: Build and push backend image
         working-directory: backend
         run: |
-          docker build -t gcr.io/$GCP_PROJECT_ID/$BACKEND_SERVICE_NAME:$GITHUB_SHA .
-          docker push gcr.io/$GCP_PROJECT_ID/$BACKEND_SERVICE_NAME:$GITHUB_SHA
+          IMAGE="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/backend-repo/$BACKEND_SERVICE_NAME:$GITHUB_SHA"
+          docker build -t $IMAGE .
+          docker push $IMAGE
 
       - name: Deploy to Cloud Run
         working-directory: backend
         run: |
+          IMAGE="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/backend-repo/$BACKEND_SERVICE_NAME:$GITHUB_SHA"
           gcloud run deploy $BACKEND_SERVICE_NAME \
-            --image gcr.io/$GCP_PROJECT_ID/$BACKEND_SERVICE_NAME:$GITHUB_SHA \
+            --image $IMAGE \
             --region $GCP_REGION \
             --platform managed \
             --allow-unauthenticated \
@@ -112,9 +114,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Install Pulumi
-        uses: pulumi/actions@v4
-        with:
-          command: install
+        uses: pulumi/actions@v6
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
