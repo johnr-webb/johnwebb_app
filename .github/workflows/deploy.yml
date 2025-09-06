@@ -113,9 +113,6 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Install Pulumi
-        uses: pulumi/actions@v6
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -137,6 +134,14 @@ jobs:
         run: |
           npm ci
           npm run build
+
+      - name: Install Pulumi
+        uses: pulumi/actions@v6
+
+      - name: Pulumi Login
+        run: pulumi login
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       - name: Deploy to Cloud Storage
         run: |
