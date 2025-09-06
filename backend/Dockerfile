@@ -1,6 +1,8 @@
 # Use Python 3.11 slim image
 FROM python:3.11-slim
 
+ENV HOST 0.0.0.0
+
 # Set working directory
 WORKDIR /app
 
