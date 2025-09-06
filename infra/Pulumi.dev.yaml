@@ -1,0 +1,3 @@
+config:
+  gcp:project: jrw-demo-project
+  gcp:region: us-central1

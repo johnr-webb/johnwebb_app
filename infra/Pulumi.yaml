@@ -1,4 +1,4 @@
-name: johnwebb_app_infrastructure
+name: johnwebb_app_infra
 description: Web app infrastructure
 runtime:
   name: python
@@ -6,8 +6,6 @@ runtime:
     toolchain: pip
     virtualenv: venv
 config:
-  gcp:project: jrw-demo-project
-  gcp:region: us-central1
   pulumi:tags:
     value:
       pulumi:template: gcp-python

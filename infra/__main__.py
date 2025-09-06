@@ -11,6 +11,7 @@ import os
 pulumi_project = pulumi.get_project()
 config = Config("gcp")
 project_id = config.require("project")
+project_id = config.require("hello_world")
 region = config.get("region") or "us-central1"
 
 # Create a service account for Cloud Run
