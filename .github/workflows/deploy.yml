@@ -156,8 +156,14 @@ jobs:
 
       - name: Deploy to Cloud Storage
         run: |
+          # List Pulumi stacks
+          pulumi stack ls
+
+          # Select stack 
+          pulumi stack select dev
+
           # Get the bucket name from Pulumi output
-          BUCKET_NAME=$(pulumi stack output frontend_bucket_name --cwd infra)
+          BUCKET_NAME=$(pulumi stack output frontend_bucket_name -s dev --cwd infra)
 
           # Sync built files to bucket
           gsutil -m rsync -r -d frontend/dist/ gs://$BUCKET_NAME/
