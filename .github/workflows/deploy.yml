@@ -4,6 +4,17 @@ on:
   workflow_run:
     workflows: ["Lint and Test"]
     types: [completed]
+  workflow_dispatch:
+    inputs:
+      deploy_environment:
+        description: "Select the deployment environment"
+        required: false
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - staging
+          - production
 
 env:
   GCP_PROJECT_ID: jrw-demo-project
