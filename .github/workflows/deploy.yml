@@ -29,6 +29,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -138,6 +140,7 @@ jobs:
             --region=${{ env.GCP_REGION }} \
             --platform=managed \
             --format="value(status.url)")
+            echo "Backend URL: $BACKEND_URL"
           echo "VITE_API_BASE_URL=$BACKEND_URL" >> $GITHUB_ENV
 
       - name: Install frontend dependencies and build
@@ -157,13 +160,22 @@ jobs:
       - name: Deploy to Cloud Storage
         run: |
           # List Pulumi stacks
+          cd infra
           pulumi stack ls
 
           # Select stack 
           pulumi stack select dev
 
           # Get the bucket name from Pulumi output
+          # Todo: set bucket name in previous step and use that instead of calling pulumi again
           BUCKET_NAME=$(pulumi stack output frontend_bucket_name -s dev --cwd infra)
+          echo "Bucket Name: $BUCKET_NAME"
+
+          cd ..
+          # Ensure gsutil is authenticated
+          gcloud auth activate-service-account --key-file=${{ secrets.GCP_SA_KEY }}
+          gcloud config set project $GCP_PROJECT_ID
+          gcloud config set compute/region $GCP_REGION
 
           # Sync built files to bucket
           gsutil -m rsync -r -d frontend/dist/ gs://$BUCKET_NAME/
