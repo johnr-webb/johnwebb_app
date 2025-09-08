@@ -4,6 +4,17 @@ on:
   workflow_run:
     workflows: ["Lint and Test"]
     types: [completed]
+  workflow_dispatch:
+    inputs:
+      deploy_environment:
+        description: "Select the deployment environment"
+        required: false
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - staging
+          - production
 
 env:
   GCP_PROJECT_ID: jrw-demo-project
@@ -145,8 +156,14 @@ jobs:
 
       - name: Deploy to Cloud Storage
         run: |
+          # List Pulumi stacks
+          pulumi stack ls
+
+          # Select stack 
+          pulumi stack select dev
+
           # Get the bucket name from Pulumi output
-          BUCKET_NAME=$(pulumi stack output frontend_bucket_name --cwd infra)
+          BUCKET_NAME=$(pulumi stack output frontend_bucket_name -s dev --cwd infra)
 
           # Sync built files to bucket
           gsutil -m rsync -r -d frontend/dist/ gs://$BUCKET_NAME/
