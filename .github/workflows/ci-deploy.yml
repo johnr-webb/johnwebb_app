@@ -1,0 +1,211 @@
+name: Monolithic Build, Test, and Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  GCP_PROJECT_ID: jrw-demo-project
+  GCP_REGION: us-central1
+  BACKEND_SERVICE_NAME: johnwebb-app-backend
+  FRONTEND_SERVICE_NAME: johnwebb-app-frontend
+  REPOSITORY: backend-repo
+
+jobs:
+  # Checks for code changes to determine which components need updating.
+  filter_changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend_changed: ${{ steps.changes.outputs.frontend }}
+      backend_changed: ${{ steps.changes.outputs.backend }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Check for Path Changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          # Define filters based on your directory structure
+          filters: |
+            frontend:
+              - 'frontend/**'
+            backend:
+              - 'backend/**'
+
+  # Frontend Build Job: Runs conditionally based on path changes.
+  build_frontend:
+    needs: [filter_changes]
+    runs-on: ubuntu-latest
+    if: needs.filter_changes.outputs.frontend_changed == 'true'
+
+    outputs:
+      frontend_image_url: ${{ steps.build_and_publish.outputs.IMAGE_URL }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # --- Frontend Lint and Test Steps ---
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies and run linting
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run lint
+
+      - name: Run tests
+        working-directory: frontend
+        run: npm run test:ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev
+
+      - name: Build and push Docker image
+        id: build_and_publish
+        working-directory: frontend
+        run: |
+          # Build and push Docker image to Artifact Registry
+          IMAGE_URL="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.FRONTEND_SERVICE_NAME }}:${{ github.sha }}"
+          docker build -t $IMAGE_URL .
+          docker push $IMAGE_URL
+          echo "IMAGE_URL=$IMAGE_URL" >> $GITHUB_OUTPUT
+
+  # Backend Build Job: Runs conditionally based on path changes.
+  build_backend:
+    needs: [filter_changes]
+    runs-on: ubuntu-latest
+    if: needs.filter_changes.outputs.backend_changed == 'true'
+
+    outputs:
+      backend_image_url: ${{ steps.build_and_publish.outputs.IMAGE_URL }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install backend dependencies and run linting
+        working-directory: backend
+        run: |
+          pip install -r requirements-dev.txt
+          # Run linting
+          isort --check-only app/
+          black --check app/
+          flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Configure GCP credentials
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker to use gcloud as a credential helper
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev
+
+      - name: Build and push backend image
+        id: build_and_publish
+        working-directory: backend
+        run: |
+          # Build and push Docker image to Artifact Registry
+          IMAGE_URL="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.BACKEND_SERVICE_NAME }}:${{ github.sha }}"
+          docker build -t $IMAGE_URL .
+          docker push $IMAGE_URL
+          echo "IMAGE_URL=$IMAGE_URL" >> $GITHUB_OUTPUT
+
+  # 4. Consolidated Deployment Job: Runs only if a change occurred.
+  deploy:
+    needs: [build_frontend, build_backend]
+    runs-on: ubuntu-latest
+
+    # Checks if either build job was a success (ran) OR was skipped (but not a failure)
+    if: |
+      (needs.build_frontend.result == 'success' || needs.build_frontend.result == 'skipped') &&
+      (needs.build_backend.result == 'success' || needs.build_backend.result == 'skipped') &&
+      (needs.filter_changes.outputs.frontend_changed == 'true' || needs.filter_changes.outputs.backend_changed == 'true')
+
+    env:
+      PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+      PULUMI_STACK: dev
+      INFRA_DIR: infra
+
+      FRONTEND_IMAGE_URL: ${{ needs.build_frontend.result != 'skipped' && needs.build_frontend.outputs.frontend_image_url || '' }}
+      BACKEND_IMAGE_URL: ${{ needs.build_backend.result != 'skipped' && needs.build_backend.outputs.backend_image_url || '' }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: Setup Pulumi
+        uses: pulumi/actions@v6
+
+      - name: Install Pulumi dependencies
+        working-directory: ${{ env.INFRA_DIR }}
+        run: |
+          pip install -r requirements.txt
+
+      - name: Configure GCP credentials
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      # Update Pulumi Config with New Image URLs
+      - name: Update Pulumi Config with New Image URL
+        run: |
+          if [[ -n "${{ env.BACKEND_IMAGE_URL }}" ]]; then
+            echo "NEW_BACKEND_IMAGE: ${{ env.BACKEND_IMAGE_URL }}"
+            pulumi config set backend_image --stack ${{ env.PULUMI_STACK }} "${{ env.BACKEND_IMAGE_URL }}" --non-interactive --cwd ${{ env.INFRA_DIR }}
+          else
+            echo "No new backend image provided."
+          fi
+          if [[ -n "${{ env.FRONTEND_IMAGE_URL }}" ]]; then
+            echo "NEW_FRONTEND_IMAGE: ${{ env.FRONTEND_IMAGE_URL }}"
+            pulumi config set frontend_image --stack ${{ env.PULUMI_STACK }} "${{ env.FRONTEND_IMAGE_URL }}" --non-interactive --cwd ${{ env.INFRA_DIR }}
+          else
+            echo "No new frontend image provided."
+          fi
+
+      # Deploy Infrastructure
+      - name: Deploy Infrastructure
+        uses: pulumi/actions@v6
+        id: pulumi-up
+        with:
+          command: up --yes
+          stack-name: ${{ env.PULUMI_STACK }}
+          work-dir: ${{ env.INFRA_DIR }}
+          debug: true
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      - name: Echo infrastructure deployment status
+        run: |
+          echo "Infrastructure deployed successfully!"

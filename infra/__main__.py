@@ -89,7 +89,7 @@ cloud_run_service = cloudrunv2.Service(
     template=cloudrunv2.ServiceTemplateArgs(
         containers=[
             cloudrunv2.ServiceTemplateContainerArgs(
-                image="gcr.io/cloudrun/hello",  # Replace with your FastAPI Docker image
+                image="gcr.io/cloudrun/hello",  # Replace with your Artifact Registry image URL
                 ports=cloudrunv2.ServiceTemplateContainerPortsArgs(
                     container_port=8000
                 ),
