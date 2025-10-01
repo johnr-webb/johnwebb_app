@@ -16,10 +16,8 @@ on:
       tag:
         description: "Used for image version (defaults to current SHA)"
         required: false
-        default: ${{ github.sha }}
 
 env:
-  UID=
   GCP_PROJECT_ID: jrw-demo-project
   GCP_REGION: us-central1
   BACKEND_SERVICE_NAME: johnwebb-app-backend
@@ -72,7 +70,7 @@ jobs:
         working-directory: frontend
         run: |
           IMAGE_TAG="${{ github.event.inputs.tag || github.sha }}"
-          IMAGE_URL="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.FRONTEND_SERVICE_NAME }}:${{ IMAGE_TAG }}"
+          IMAGE_URL="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.FRONTEND_SERVICE_NAME }}:${IMAGE_TAG}"
           docker build -t $IMAGE_URL .
           docker push $IMAGE_URL
           echo "IMAGE_URL=$IMAGE_URL" >> $GITHUB_OUTPUT
@@ -117,7 +115,7 @@ jobs:
         working-directory: backend
         run: |
           IMAGE_TAG="${{ github.event.inputs.tag || github.sha }}"
-          IMAGE_URL="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.FRONTEND_SERVICE_NAME }}:${{ IMAGE_TAG }}"
+          IMAGE_URL="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.FRONTEND_SERVICE_NAME }}:${IMAGE_TAG}"
           docker build -t $IMAGE_URL .
           docker push $IMAGE_URL
           echo "IMAGE_URL=$IMAGE_URL" >> $GITHUB_OUTPUT
