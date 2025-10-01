@@ -19,7 +19,6 @@ on:
         default: ${{ github.sha }}
 
 env:
-  UID=
   GCP_PROJECT_ID: jrw-demo-project
   GCP_REGION: us-central1
   BACKEND_SERVICE_NAME: johnwebb-app-backend
