@@ -19,7 +19,8 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-# This is for the database. You can uncomment if you want to create tables on startup.
+# Can uncomment in the future if needed
+# This is for the database.
 # @asynccontextmanager
 # async def lifespan(app: FastAPI):
 #     # Startup
@@ -39,6 +40,7 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
+
 
 @app.get("/")
 async def read_root():
