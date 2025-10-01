@@ -1,8 +1,16 @@
-name: Test, Build, and Deploy
+name: Manual Full Deployment (Forced Build & Deploy)
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      stack:
+        description: "Pulumi Stack Name (e.g., dev, staging, prod)"
+        required: true
+        default: "dev"
+      tag:
+        description: "Optional: Docker Tag / Image Version (defaults to current SHA)"
+        required: false
+        default: ${{ github.sha }}
 
 env:
   GCP_PROJECT_ID: jrw-demo-project
@@ -12,31 +20,9 @@ env:
   REPOSITORY: backend-repo
 
 jobs:
-  filter_changes:
-    runs-on: ubuntu-latest
-    outputs:
-      frontend_changed: ${{ steps.changes.outputs.frontend }}
-      backend_changed: ${{ steps.changes.outputs.backend }}
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v5
-
-      - name: Check for Path Changes
-        id: changes
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            frontend:
-              - 'frontend/**'
-            backend:
-              - 'backend/**'
-
   # Frontend Build Job
   build_frontend:
-    needs: [filter_changes]
     runs-on: ubuntu-latest
-    if: needs.filter_changes.outputs.frontend_changed == 'true'
-
     outputs:
       frontend_image_url: ${{ steps.build_and_publish.outputs.IMAGE_URL }}
 
@@ -57,10 +43,7 @@ jobs:
         run: |
           npm ci
           npm run lint
-
-      - name: Run tests
-        working-directory: frontend
-        run: npm run test:ci
+          npm run test:ci
 
       - name: Build frontend
         working-directory: frontend
@@ -81,18 +64,15 @@ jobs:
         id: build_and_publish
         working-directory: frontend
         run: |
-          # Build and push Docker image to Artifact Registry
-          IMAGE_URL="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.FRONTEND_SERVICE_NAME }}:${{ github.sha }}"
+          # Use the user-provided 'tag' input
+          IMAGE_URL="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.FRONTEND_SERVICE_NAME }}:${{ github.event.inputs.tag }}"
           docker build -t $IMAGE_URL .
           docker push $IMAGE_URL
           echo "IMAGE_URL=$IMAGE_URL" >> $GITHUB_OUTPUT
 
   # Backend Build Job
   build_backend:
-    needs: [filter_changes]
     runs-on: ubuntu-latest
-    if: needs.filter_changes.outputs.backend_changed == 'true'
-
     outputs:
       backend_image_url: ${{ steps.build_and_publish.outputs.IMAGE_URL }}
 
@@ -105,11 +85,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install backend dependencies and run linting
+      - name: Install dependencies and run linting
         working-directory: backend
         run: |
           pip install -r requirements-dev.txt
-          # Run linting
+          # Run linting and tests
           isort --check-only app/
           black --check app/
           flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -129,8 +109,8 @@ jobs:
         id: build_and_publish
         working-directory: backend
         run: |
-          # Build and push Docker image to Artifact Registry
-          IMAGE_URL="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.BACKEND_SERVICE_NAME }}:${{ github.sha }}"
+          # Use the user-provided 'tag' input
+          IMAGE_URL="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.BACKEND_SERVICE_NAME }}:${{ github.event.inputs.tag }}"
           docker build -t $IMAGE_URL .
           docker push $IMAGE_URL
           echo "IMAGE_URL=$IMAGE_URL" >> $GITHUB_OUTPUT
@@ -139,19 +119,18 @@ jobs:
   deploy:
     needs: [build_frontend, build_backend]
     runs-on: ubuntu-latest
-
-    if: |
-      (needs.build_frontend.result == 'success' || needs.build_frontend.result == 'skipped') &&
-      (needs.build_backend.result == 'success' || needs.build_backend.result == 'skipped') &&
-      (needs.build_frontend.result == 'success' || needs.build_backend.result == 'success')
+    # Simple if condition: only proceed if ALL needed jobs succeeded.
+    if: success()
 
     env:
       PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-      PULUMI_STACK: dev
+      # Use the 'stack' input provided by the user in the trigger form
+      PULUMI_STACK: ${{ github.event.inputs.stack }}
       INFRA_DIR: infra
 
-      FRONTEND_IMAGE_URL: ${{ needs.build_frontend.result != 'skipped' && needs.build_frontend.outputs.frontend_image_url || '' }}
-      BACKEND_IMAGE_URL: ${{ needs.build_backend.result != 'skipped' && needs.build_backend.outputs.backend_image_url || '' }}
+      # Image URLs are guaranteed to be present since both jobs are mandatory
+      FRONTEND_IMAGE_URL: ${{ needs.build_frontend.outputs.frontend_image_url }}
+      BACKEND_IMAGE_URL: ${{ needs.build_backend.outputs.backend_image_url }}
 
     steps:
       - name: Checkout Code
@@ -162,8 +141,7 @@ jobs:
 
       - name: Install Pulumi dependencies
         working-directory: ${{ env.INFRA_DIR }}
-        run: |
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
       - name: Configure GCP credentials
         uses: google-github-actions/auth@v2
@@ -173,21 +151,14 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      # Update Pulumi Config with New Image URLs
       - name: Update Pulumi Config with New Image URL
         run: |
-          if [[ -n "${{ env.BACKEND_IMAGE_URL }}" ]]; then
-            echo "NEW_BACKEND_IMAGE: ${{ env.BACKEND_IMAGE_URL }}"
-            pulumi config set backend_image --stack ${{ env.PULUMI_STACK }} "${{ env.BACKEND_IMAGE_URL }}" --non-interactive --cwd ${{ env.INFRA_DIR }}
-          else
-            echo "No new backend image provided."
-          fi
-          if [[ -n "${{ env.FRONTEND_IMAGE_URL }}" ]]; then
-            echo "NEW_FRONTEND_IMAGE: ${{ env.FRONTEND_IMAGE_URL }}"
-            pulumi config set frontend_image --stack ${{ env.PULUMI_STACK }} "${{ env.FRONTEND_IMAGE_URL }}" --non-interactive --cwd ${{ env.INFRA_DIR }}
-          else
-            echo "No new frontend image provided."
-          fi
+          echo "NEW_BACKEND_IMAGE: ${{ env.BACKEND_IMAGE_URL }}"
+          # Since this is a forced deployment, we update both configs unconditionally.
+          pulumi config set backend_image --stack ${{ env.PULUMI_STACK }} "${{ env.BACKEND_IMAGE_URL }}" --non-interactive --cwd ${{ env.INFRA_DIR }}
+
+          echo "NEW_FRONTEND_IMAGE: ${{ env.FRONTEND_IMAGE_URL }}"
+          pulumi config set frontend_image --stack ${{ env.PULUMI_STACK }} "${{ env.FRONTEND_IMAGE_URL }}" --non-interactive --cwd ${{ env.INFRA_DIR }}
 
       - name: Deploy Infrastructure
         uses: pulumi/actions@v6
@@ -201,5 +172,4 @@ jobs:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       - name: Echo infrastructure deployment status
-        run: |
-          echo "Infrastructure deployed successfully!"
+        run: echo "Infrastructure deployed successfully to ${{ env.PULUMI_STACK }}!"
