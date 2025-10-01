@@ -13,6 +13,11 @@ on:
         description: "Pulumi Stack Name (e.g., dev, staging, prod)"
         required: true
         default: "dev"
+      tag:
+        description: "Used for image version (defaults to current SHA)"
+        required: false
+        default: ${{ github.sha }}
+
 
 env:
   GCP_PROJECT_ID: jrw-demo-project
