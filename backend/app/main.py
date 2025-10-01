@@ -40,6 +40,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
+
 @app.get("/")
 async def read_root():
     return {"message": "Hello, World!"}

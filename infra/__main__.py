@@ -47,7 +47,7 @@ backend_service = cloudrunv2.Service("backend-service",
                 limits={"cpu": "1", "memory": "512Mi"}
             ),
             ports=cloudrunv2.ServiceTemplateContainerPortsArgs(
-                container_port=8000,
+                container_port=8080,
             ),
         )],
     ),
