@@ -1,5 +1,6 @@
 # Project Overview: John Webb App
 
+This project is first and foremost a space for me to develop and learn!
 This document provides a summary of the project structure, dependencies, and the purpose of each major folder in the repository.
 
 ---
