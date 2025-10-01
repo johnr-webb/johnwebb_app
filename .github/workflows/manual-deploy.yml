@@ -18,7 +18,6 @@ on:
         required: false
         default: ${{ github.sha }}
 
-
 env:
   GCP_PROJECT_ID: jrw-demo-project
   GCP_REGION: us-central1
