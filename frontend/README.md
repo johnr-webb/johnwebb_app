@@ -70,48 +70,6 @@ src/
 └── setupTests.js       # Vitest testing setup
 ```
 
-## 🚀 Getting Started
-
-### Prerequisites
-
-- **Node.js** 18+ (recommended: 20+)
-- **npm** or **yarn** package manager
-
-### Installation
-
-1. **Clone the repository**
-
-   ```bash
-   git clone <repository-url>
-   cd frontend
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment variables**
-
-   ```bash
-   # Create .env file
-   cp .env.example .env
-
-   # Configure your environment
-   VITE_API_BASE_URL=http://localhost:8000
-   VITE_NODE_ENV=development
-   ```
-
-4. **Start development server**
-
-   ```bash
-   npm run dev
-   ```
-
-5. **Open your browser**
-   Navigate to `http://localhost:5173`
-
 ## 🧪 Testing
 
 ### Run Tests
@@ -267,24 +225,3 @@ VITE_ENABLE_DEBUG_MODE=false             # Debug mode toggle
 - Write meaningful commit messages
 - Include tests for new features
 - Update documentation as needed
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-## 👨‍💻 About Me
-
-**John Webb** - Cloud Security Engineer at Citi Bank
-
-- **Focus**: Cloud Threat Informed Defense
-- **Background**: Computer Science & Economics, University of Michigan
-- **Interests**: Technology, skiing, running, tennis, travel
-- **Philosophy**: Finding simple solutions to complex problems
-
-## 📞 Contact
-
-- **Email**: [johnwebb354@gmail.com](mailto:johnwebb354@gmail.com)
-- **GitHub**: [@johnr-webb](https://github.com/johnr-webb)
-- **LinkedIn**: [John Webb](https://www.linkedin.com/in/john-webb-643346170/)
-
----
