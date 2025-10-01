@@ -4,11 +4,6 @@ import pulumi
 from pulumi import Config
 from pulumi_gcp import cloudrunv2
 from pulumi_gcp import organizations
-from dotenv import load_dotenv
-
-# Local environment setup
-# These will be overridden by the GHA environment variables when run in CI.
-load_dotenv()
 
 # Get Pulumi configuration values
 config = pulumi.Config()
