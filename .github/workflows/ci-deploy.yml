@@ -9,7 +9,7 @@ env:
   GCP_REGION: us-central1
   BACKEND_SERVICE_NAME: johnwebb-app-backend
   FRONTEND_SERVICE_NAME: johnwebb-app-frontend
-  REPOSITORY: backend-repo
+  REPOSITORY: johnwebb-app-repository
 
 jobs:
   filter_changes:

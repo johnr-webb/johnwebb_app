@@ -1,35 +1,40 @@
-# Use Python 3.11 slim image
-FROM python:3.11-slim
+# Build
+FROM python:3.11-slim as builder
 
-ENV HOST 0.0.0.0
-
-# Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install System Dependencies (Needed for many Python packages like database drivers)
+# Install gcc and clean up the cache immediately to reduce build layer size
 RUN apt-get update && apt-get install -y \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
+# Copy requirements
 COPY requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Production
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy installed packages and application code from the builder stage
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY . .
 
-# Create non-root user
+# Create a dedicated, unprivileged user 'app' and switch context.
 RUN useradd --create-home --shell /bin/bash app && chown -R app:app /app
 USER app
 
-# Expose port
-EXPOSE 8000
+# Configure Environment Variables
+ENV PORT 8080
+ENV HOST 0.0.0.0
+ENV PYTHONUNBUFFERED 1
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/ || exit 1
+# Expose Port
+EXPOSE 8080
 
-# Run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${PORT:-8000}"]
+# Run the Application
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${PORT}"]
