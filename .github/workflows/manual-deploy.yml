@@ -5,8 +5,6 @@ name: Manual Deployment
 # they can trigger this workflow from the GitHub Actions tab.
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
     inputs:
       stack:

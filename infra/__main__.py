@@ -3,7 +3,7 @@
 import pulumi
 from pulumi import Config
 from pulumi_gcp import cloudrunv2 as cloudrun
-from pulumi_gcp import projects
+from pulumi_gcp import organizations
 
 # Get Pulumi configuration values
 config = pulumi.Config()
@@ -15,7 +15,8 @@ gcp_config = Config("gcp")
 region = gcp_config.require('region') or "us-central1"
 project = gcp_config.require("project")
 
-project_number = projects.get_project(filter=f"id:{project}").number
+gcp_project = organizations.get_project(project_id=project)
+project_number = gcp_project.project_id
 
 backend_service = cloudrun.Service(
     "backend-service",
