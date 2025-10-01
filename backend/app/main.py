@@ -19,18 +19,18 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+# This is for the database. You can uncomment if you want to create tables on startup.
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     # Startup
+#     async with engine.begin() as conn:
+#         await conn.run_sync(Base.metadata.create_all)
+#     yield
+#     # Shutdown
+#     await engine.dispose()
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    yield
-    # Shutdown
-    await engine.dispose()
 
-
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
@@ -52,5 +52,5 @@ async def say_hello(name: str):
 
 
 # Routers
-app.include_router(users_router)
-app.include_router(posts_router)
+# app.include_router(users_router)
+# app.include_router(posts_router)

@@ -2,7 +2,7 @@
 
 import pulumi
 from pulumi import Config
-from pulumi_gcp import cloudrunv2 as cloudrun
+from pulumi_gcp import cloudrunv2
 from pulumi_gcp import organizations
 
 # Get Pulumi configuration values
@@ -18,42 +18,47 @@ project = gcp_config.require("project")
 gcp_project = organizations.get_project(project_id=project)
 project_number = gcp_project.project_id
 
-backend_service = cloudrun.Service(
-    "backend-service",
+
+# Frontend Cloud Run Service
+frontend_service = cloudrunv2.Service("frontend-service",
+    name="frontend-service",
     location=region,
-    name="johnwebb-app-backend",
-    template={
-        "containers": [{
-            "image": backend_image_url,
-            "resources": {"limits": {"cpu": "1", "memory": "512Mi"}},
-            "ports": [{"container_port": 8080}], 
-        }],
-        "service_account": f"{project_number}-compute@developer.gserviceaccount.com"
-    },
-    traffics=[{
-        "type": "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST",
-        "percent": 100,
-    }]
+    template=cloudrunv2.ServiceTemplateArgs(
+        containers=[cloudrunv2.ServiceTemplateContainerArgs(
+            image=frontend_image_url,
+            resources=cloudrunv2.ServiceTemplateContainerResourcesArgs(
+                limits={"cpu": "1", "memory": "512Mi"}
+            ),
+            ports=cloudrunv2.ServiceTemplateContainerPortsArgs(
+                container_port=3000,
+            ),
+        )],
+    )
 )
 
-frontend_service = cloudrun.Service(
-    "frontend-service",
+# Backend Cloud Run Service
+backend_service = cloudrunv2.Service("backend-service",
+    name="backend-service",
     location=region,
-    name="johnwebb-app-frontend",
-    template={
-        "containers": [{
-            "image": frontend_image_url,
-            "resources": {"limits": {"cpu": "1", "memory": "256Mi"}},
-        }],
-    },
-    traffics=[{
-        "type": "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST",
-        "percent": 100,
-    }]
+    template=cloudrunv2.ServiceTemplateArgs(
+        containers=[cloudrunv2.ServiceTemplateContainerArgs(
+            image=backend_image_url,
+            resources=cloudrunv2.ServiceTemplateContainerResourcesArgs(
+                limits={"cpu": "1", "memory": "512Mi"}
+            ),
+            ports=cloudrunv2.ServiceTemplateContainerPortsArgs(
+                container_port=8000,
+            ),
+        )],
+    ),
+    traffics=[cloudrunv2.ServiceTrafficArgs(
+        type="TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST",
+        percent=100,
+    )]
 )
 
 # IAM Policies
-backend_iam_policy = cloudrun.ServiceIamMember(
+backend_iam_policy = cloudrunv2.ServiceIamMember(
     "backend-iam-public",
     location=backend_service.location,
     name=backend_service.name,
@@ -61,7 +66,7 @@ backend_iam_policy = cloudrun.ServiceIamMember(
     member="allUsers"
 )
 
-frontend_iam_policy = cloudrun.ServiceIamMember(
+frontend_iam_policy = cloudrunv2.ServiceIamMember(
     "frontend-iam-public",
     location=frontend_service.location,
     name=frontend_service.name,

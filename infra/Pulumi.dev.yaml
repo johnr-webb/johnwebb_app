@@ -1,3 +1,6 @@
 config:
   gcp:project: jrw-demo-project
   gcp:region: us-central1
+
+  backend_image: us-central1-docker.pkg.dev/jrw-demo-project/backend-repo/johnwebb-app-backend:ec44263f1d81645492b544c57e1e3cf12b20f5dc
+  frontend_image: us-central1-docker.pkg.dev/jrw-demo-project/backend-repo/johnwebb-app-frontend:ec44263f1d81645492b544c57e1e3cf12b20f5dc
