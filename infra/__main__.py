@@ -15,7 +15,7 @@ gcp_config = Config("gcp")
 region = gcp_config.require('region') or "us-central1"
 project = gcp_config.require("project")
 
-project_number = projects.get_project().number
+project_number = projects.get_project(filter=f"id:{project}").number
 
 backend_service = cloudrun.Service(
     "backend-service",
