@@ -113,7 +113,7 @@ jobs:
         working-directory: backend
         run: |
           IMAGE_TAG="${{ github.event.inputs.tag || github.sha }}"
-          IMAGE_URL="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.FRONTEND_SERVICE_NAME }}:${IMAGE_TAG}"
+          IMAGE_URL="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.BACKEND_SERVICE_NAME }}:${IMAGE_TAG}"
           docker build -t $IMAGE_URL .
           docker push $IMAGE_URL
           echo "IMAGE_URL=$IMAGE_URL" >> $GITHUB_OUTPUT

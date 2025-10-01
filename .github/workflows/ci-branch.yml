@@ -1,0 +1,93 @@
+name: Branch/PR CI
+
+# This workflow runs on every push to every branch *except* 'main'.
+on:
+  push:
+    branches-ignore:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  NODE_VERSION: "22"
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  filter_changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend_changed: ${{ steps.changes.outputs.frontend }}
+      backend_changed: ${{ steps.changes.outputs.backend }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: Check for Path Changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+            backend:
+              - 'backend/**'
+
+  check_frontend:
+    needs: [filter_changes]
+    runs-on: ubuntu-latest
+    if: needs.filter_changes.outputs.frontend_changed == 'true'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies and run linting
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run lint
+
+      - name: Run tests
+        working-directory: frontend
+        run: npm run test:ci
+
+  check_backend:
+    needs: [filter_changes]
+    runs-on: ubuntu-latest
+    if: needs.filter_changes.outputs.backend_changed == 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install backend dependencies and run linting
+        working-directory: backend
+        run: |
+          # Install development dependencies needed for linting and testing
+          pip install -r requirements-dev.txt
+
+          echo "Running Linting Checks..."
+          # Assuming standard Python linting tools are used
+          isort --check-only app/
+          black --check app/
+          flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Install backend dependencies and run linting
+        working-directory: backend
+        run: |
+          echo "Running Tests..."
+          # Uncomment when there are actual tests to run
+          # pytest
