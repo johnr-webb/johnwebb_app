@@ -1,16 +1,18 @@
-name: Manual Full Deployment (Forced Build & Deploy)
+name: Manual Deployment
+
+# This workflow allows for manual deployment of both frontend and backend services.
+# In the case that developers need to force a deployment
+# they can trigger this workflow from the GitHub Actions tab.
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       stack:
         description: "Pulumi Stack Name (e.g., dev, staging, prod)"
         required: true
         default: "dev"
-      tag:
-        description: "Optional: Docker Tag / Image Version (defaults to current SHA)"
-        required: false
-        default: ${{ github.sha }}
 
 env:
   GCP_PROJECT_ID: jrw-demo-project
