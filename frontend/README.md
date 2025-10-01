@@ -1,6 +1,11 @@
-# John Webb - Personal Portfolio & Development Space
+# John Webb - Personal Portfolio & Development Space Frontend
 
-A modern, responsive React application showcasing my professional journey, projects, and thoughts. Built with Material-UI v7+ and modern React patterns.
+A React app using Vite to act as a portfolio, sandbox environment, and personal journey documentation.
+
+Built with MUI and modern React patterns.
+
+If you see anything you like, dislike, have questions about, reach out via email **johnwebb354@gmail.com**.
+I'm always excited to receive harsh feedback, or collaborate with strangers.
 
 ## 🚀 Features
 
