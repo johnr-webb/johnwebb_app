@@ -2,15 +2,11 @@
 
 import logging
 import sys
-from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.database import Base, engine  # Import engine and Base
-from app.routers.posts import router as posts_router
-from app.routers.users import router as users_router
 
 logging.basicConfig(
     stream=sys.stdout,
