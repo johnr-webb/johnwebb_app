@@ -141,9 +141,9 @@ jobs:
     runs-on: ubuntu-latest
 
     if: |
+      always() &&
       (needs.build_frontend.result == 'success' || needs.build_frontend.result == 'skipped') &&
-      (needs.build_backend.result == 'success' || needs.build_backend.result == 'skipped') &&
-      (needs.build_frontend.result == 'success' || needs.build_backend.result == 'success')
+      (needs.build_backend.result == 'success' || needs.build_backend.result == 'skipped')
 
     env:
       PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
@@ -196,7 +196,6 @@ jobs:
           command: up
           stack-name: ${{ env.PULUMI_STACK }}
           work-dir: ${{ env.INFRA_DIR }}
-          debug: true
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
