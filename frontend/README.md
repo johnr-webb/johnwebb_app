@@ -193,6 +193,7 @@ VITE_ENABLE_DEBUG_MODE=false             # Debug mode toggle
 ### Planned Features
 
 - [ ] **Authentication System** - User login and registration
+- [ ] **More projects to include**
 - [ ] **Blog System** - Markdown support for thoughts
 - [ ] **Project Showcase** - Interactive project demos
 - [ ] **Contact Form** - Direct communication
