@@ -22,7 +22,12 @@ WORKDIR /app
 
 # Copy installed packages and application code from the builder stage
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY . .
+
+# Copy the executables (like 'uvicorn', 'fastapi') to a PATH directory
+COPY --from=builder /usr/local/bin/ /usr/local/bin/
+
+# Copy application code
+COPY ./app ./app
 
 # Create a dedicated, unprivileged user 'app' and switch context.
 RUN useradd --create-home --shell /bin/bash app && chown -R app:app /app
