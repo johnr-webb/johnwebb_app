@@ -1,5 +1,5 @@
 # Build
-FROM python:3.11-slim as builder
+FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
@@ -34,13 +34,12 @@ RUN useradd --create-home --shell /bin/bash app && chown -R app:app /app
 USER app
 
 # Configure Environment Variables
-ENV PORT 8080
-ENV HOST 0.0.0.0
-ENV PYTHONUNBUFFERED 1
+ENV PORT=8080
+ENV HOST=0.0.0.0
+ENV PYTHONUNBUFFERED=1
 
 # Expose Port
 EXPOSE 8080
 
 # Run the Application
-# CMD ["sh, "-c", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${PORT}"]
-CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT}
+CMD ["/bin/sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]
